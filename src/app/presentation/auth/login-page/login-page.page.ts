@@ -1,3 +1,5 @@
+// src/app/presentation/auth/login-page/login-page.page.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
@@ -88,7 +90,7 @@ export class LoginPagePage implements OnInit {
       if (exito) {
         await this.mostrarToast('¡Sesión iniciada correctamente!', 'success');
         setTimeout(() => {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/tabs/home']);
         }, 1000);
       } else {
         await this.mostrarToast('Credenciales incorrectas. Por favor, verifica tus datos.', 'danger');

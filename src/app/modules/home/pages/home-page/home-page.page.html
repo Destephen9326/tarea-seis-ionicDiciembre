@@ -1,0 +1,91 @@
+<ion-content [fullscreen]="true" class="home-content">
+  
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!isLoading" class="main-container">
+    
+    <!-- Header con saludo -->
+   
+<!-- Header con saludo -->
+<div class="header-section">
+  <div class="user-greeting">
+    <ion-avatar class="user-avatar">
+      <img [src]="user?. imageProfile || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="avatar" />
+    </ion-avatar>
+    <span class="greeting-text">Hola {{ getUserName() }}!</span>
+  </div>
+  
+  <!-- Botón cerrar sesión -->
+  <button class="logout-btn" (click)="cerrarSesion()">
+    <ion-icon name="log-out-outline"></ion-icon>
+  </button>
+</div>
+
+    <!-- Tarjeta de saldo -->
+    <ion-card class="balance-card">
+      <ion-card-content>
+        <p class="balance-label">Tu saldo</p>
+        <h1 class="balance-amount">
+          <span class="currency">HNL</span> 
+          <span class="amount">{{ balance ?  formatBalance(balance.availableBalance) : '0.00' }}</span>
+        </h1>
+        
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+          <div class="action-btn">
+            <div class="icon-circle">
+              <ion-icon name="arrow-up-outline"></ion-icon>
+            </div>
+            <span>Recargá</span>
+          </div>
+          <div class="action-btn">
+            <div class="icon-circle">
+              <ion-icon name="arrow-down-outline"></ion-icon>
+            </div>
+            <span>Retirá</span>
+          </div>
+          <div class="action-btn">
+            <div class="icon-circle">
+              <ion-icon name="swap-horizontal-outline"></ion-icon>
+            </div>
+            <span>Transferí</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sección de transacciones -->
+    <div class="transactions-section">
+      <h2 class="section-title">Transacciones</h2>
+      
+      <ion-list *ngIf="transactions.length > 0" lines="none" class="transactions-list">
+        <ion-item *ngFor="let transaction of transactions" class="transaction-item">
+          <ion-avatar slot="start" class="transaction-icon">
+            <div [class]="transaction.transactionType === 1 ? 'icon-credit' : 'icon-debit'">
+              <ion-icon [name]="transaction.transactionType === 1 ? 'arrow-down-outline' : 'arrow-up-outline'"></ion-icon>
+            </div>
+          </ion-avatar>
+          <ion-label>
+            <h3>{{ transaction.description }}</h3>
+            <p>{{ transaction.transactionTypeDescription }}</p>
+          </ion-label>
+          <ion-text slot="end" [color]="transaction.transactionType === 1 ? 'success' : 'danger'" class="transaction-amount">
+            {{ transaction.transactionType === 1 ? '+' : '-' }}L {{ formatBalance(transaction.amount) }}
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-text>
+        </ion-item>
+      </ion-list>
+
+      <!-- Sin transacciones -->
+      <div *ngIf="transactions.length === 0" class="no-transactions">
+        <p>No hay transacciones aún</p>
+      </div>
+    </div>
+
+  </div>
+
+</ion-content>

@@ -1,0 +1,256 @@
+.home-content {
+  --background: #1a1a2e;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.main-container {
+  padding: 16px;
+  padding-top: 50px;
+}
+
+// Header con saludo
+.header-section {
+  display:  flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap:  12px;
+}
+
+.user-avatar {
+  width:  45px;
+  height:  45px;
+}
+
+.greeting-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  
+  ion-icon {
+    color: #ffffff;
+    font-size: 20px;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  &:active {
+    background: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap:  12px;
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+}
+
+.greeting-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight:  600;
+}
+
+// Tarjeta de saldo
+.balance-card {
+  background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #8b5cf6 100%);
+  border-radius: 20px;
+  margin:  0 0 24px 0;
+  box-shadow: 0 10px 40px rgba(107, 33, 168, 0.4);
+}
+
+.balance-card ion-card-content {
+  padding: 24px;
+}
+
+.balance-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin:  0 0 8px 0;
+  text-align: center;
+}
+
+.balance-amount {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  text-align: center;
+  
+  .currency {
+    font-size: 24px;
+    font-weight:  600;
+  }
+  
+  .amount {
+    letter-spacing: 1px;
+  }
+}
+
+// Botones de acción
+.action-buttons {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 20px;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  
+  .icon-circle {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    ion-icon {
+      color: #ffffff;
+      font-size: 22px;
+    }
+  }
+  
+  span {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+// Sección de transacciones
+.transactions-section {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  margin:  0 -16px;
+  min-height: 300px;
+}
+
+.section-title {
+  color: #1a1a2e;
+  font-size: 18px;
+  font-weight:  600;
+  margin:  0 0 16px 0;
+  text-align: center;
+}
+
+.transactions-list {
+  background: transparent;
+}
+
+.transaction-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+}
+
+.transaction-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  
+  div {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+  
+  .icon-credit {
+    background: #dcfce7;
+    ion-icon {
+      color: #16a34a;
+    }
+  }
+  
+  .icon-debit {
+    background:  #fee2e2;
+    ion-icon {
+      color: #dc2626;
+    }
+  }
+}
+
+.transaction-item ion-label {
+  h3 {
+    color: #1a1a2e;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+  
+  p {
+    color: #6b7280;
+    font-size: 13px;
+    margin: 0;
+  }
+}
+
+.transaction-amount {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  ion-icon {
+    font-size: 16px;
+    color: #9ca3af;
+  }
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 40px 20px;
+  
+  p {
+    color: #6b7280;
+    font-size: 14px;
+  }
+}
