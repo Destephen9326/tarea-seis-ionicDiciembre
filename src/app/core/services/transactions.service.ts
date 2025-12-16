@@ -8,11 +8,11 @@ import { Transaction } from '../interfaces/transaction.interface';
 })
 export class TransactionsService {
 
-  private apiUrl = 'https://wallet-ceutec-api.azurewebsites. net/api';
+  private apiUrl = 'https://wallet-ceutec-api.azurewebsites.net/api';
 
   constructor(private http: HttpClient) {}
 
   getTransactions(): Observable<Transaction[]> {
-    return this. http.get<Transaction[]>(`${this.apiUrl}/transactions`);
+    return this.http.get<Transaction[]>(`${this.apiUrl}/transactions`);
   }
 }

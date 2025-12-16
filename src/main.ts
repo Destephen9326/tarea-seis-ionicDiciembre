@@ -19,7 +19,7 @@ const firebaseConfig = {
   appId:  "1:824076357543:web:d65d478f1697458f22b082",
   storageBucket: "wallet-app-f8f9b.firebasestorage.app",
   apiKey: "AIzaSyCKB2_5bTe2pMqq6cofcswQRox3ojxx4Qg",
-  authDomain: "wallet-app-f8f9b. firebaseapp.com",
+  authDomain: "wallet-app-f8f9b.firebaseapp.com",
   messagingSenderId: "824076357543",
   measurementId: "G-R4DYR1QW1B"
 };

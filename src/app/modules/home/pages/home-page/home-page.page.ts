@@ -4,9 +4,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, 
-  IonHeader, 
-  IonTitle, 
-  IonToolbar,
   IonCard,
   IonCardContent,
   IonIcon,
@@ -39,9 +36,6 @@ import { Transaction } from '../../../../core/interfaces/transaction.interface';
   imports: [
     CommonModule,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     IonCard,
     IonCardContent,
     IonIcon,
@@ -87,7 +81,7 @@ export class HomePagePage implements OnInit {
           transactionType: 0,
           balanceAfter: 964.77,
           description: "Walmart",
-          date: "2025-12-10T12:32:00"
+          createdAt: "2025-12-10T12:32:00"
         },
         {
           transactionTypeDescription: "Crédito",
@@ -96,7 +90,7 @@ export class HomePagePage implements OnInit {
           transactionType: 1,
           balanceAfter: 1000,
           description: "Depósito",
-          date: "2025-12-09T02:12:00"
+          createdAt: "2025-12-09T02:12:00"
         },
         {
           transactionTypeDescription: "Débito",
@@ -105,12 +99,25 @@ export class HomePagePage implements OnInit {
           transactionType: 0,
           balanceAfter: 987,
           description: "Netflix",
-          date: "2025-08-24T13:53:00"
+          createdAt: "2025-08-24T13:53:00"
         }
       ];
     }
   }, 1500);
 }
+
+  // Formatea la fecha de la transacción a 'dd/MM/yyyy HH:mm'
+  formatTransactionDate(dateString?: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
 
   async loadData() {
     this.isLoading = true;

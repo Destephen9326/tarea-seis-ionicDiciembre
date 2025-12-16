@@ -7,5 +7,7 @@ export interface Transaction {
   transactionType: number;
   balanceAfter: number;
   description: string;
-  date?: string; 
+  // Algunas respuestas vienen con `date`, otras con `createdAt`
+  date?: string;
+  createdAt?: string;
 }

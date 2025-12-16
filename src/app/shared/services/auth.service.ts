@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, TimeoutError, timeout } from 'rxjs';
 import { CreateAccountRequest, LoginRequest, PhoneVerificationRequest, PhoneVerifyRequest } from '../../core/interfaces/auth.interfaces';
 
 @Injectable({
@@ -36,8 +37,34 @@ export class AuthService {
       console.log('Body:', body);
       console.log('========================================');
       
-      // Petición POST real a la API
-      const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}/auth/login`, body));
+      const url = `${this.apiUrl}/auth/login`;
+
+      // En Android/iOS (WebView), el Origin suele ser capacitor://localhost y puede fallar por CORS.
+      // CapacitorHttp hace el request nativo y evita CORS; en web seguimos con HttpClient.
+      let response: any;
+      if (Capacitor.isNativePlatform()) {
+        const nativeRequest = CapacitorHttp.post({
+          url,
+          headers: { 'Content-Type': 'application/json' },
+          data: body,
+        });
+
+        const nativeResponse = await Promise.race([
+          nativeRequest,
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error('Tiempo de espera agotado al iniciar sesión. Verifica tu conexión e intenta nuevamente.')),
+              20000
+            )
+          ),
+        ]);
+
+        // CapacitorHttp devuelve { data, status, headers }
+        response = (nativeResponse as any)?.data ?? nativeResponse;
+      } else {
+        // Petición POST real a la API (con timeout para evitar quedarse colgado)
+        response = await firstValueFrom(this.http.post(url, body).pipe(timeout(20000)));
+      }
       
       console.log('Respuesta del login:', response);
       
@@ -56,6 +83,9 @@ export class AuthService {
       console.warn('No se encontró token en la respuesta');
       return false;
     } catch (error: any) {
+      if (error instanceof TimeoutError) {
+        throw new Error('Tiempo de espera agotado al iniciar sesión. Verifica tu conexión e intenta nuevamente.');
+      }
       console.error('Error Login:', error);
       console.error('Detalles del error:', {
         status: error?.status,

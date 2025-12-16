@@ -75,7 +75,7 @@
           </ion-label>
           <ion-text slot="end" [color]="transaction.transactionType === 1 ? 'success' : 'danger'" class="transaction-amount">
             {{ transaction.transactionType === 1 ? '+' : '-' }}L {{ formatBalance(transaction.amount) }}
-            <ion-icon name="chevron-forward-outline"></ion-icon>
+            <small>{{ formatTransactionDate(transaction.createdAt || transaction.date) }}</small>
           </ion-text>
         </ion-item>
       </ion-list>

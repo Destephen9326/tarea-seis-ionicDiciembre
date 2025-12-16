@@ -7,6 +7,7 @@ import { IonicModule, NavController, ModalController, ToastController, LoadingCo
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../../shared/services/auth.service';
+import { PushNotificationsService } from '../../../shared/services/push-notifications.service';
 import { RecuperarPasswordComponent } from '../recuperar-password/recuperar-password.component';
 
 @Component({
@@ -27,6 +28,7 @@ export class LoginPagePage implements OnInit {
     private router: Router,
     private modalCtrl: ModalController,
     private authService: AuthService,
+    private pushNotificationsService: PushNotificationsService,
     private toastController: ToastController,
     private loadingController: LoadingController
   ) { }
@@ -84,10 +86,13 @@ export class LoginPagePage implements OnInit {
 
       const exito = await this.authService.login(email, password);
 
-      await loading.dismiss();
-      this.isLoading = false;
-
       if (exito) {
+        // Inicializar push y sincronizar token en segundo plano
+        this.pushNotificationsService
+          .init()
+          .then(() => this.pushNotificationsService.syncCachedTokenToApi())
+          .catch((err) => console.error('Error inicializando push:', err));
+
         await this.mostrarToast('¡Sesión iniciada correctamente!', 'success');
         setTimeout(() => {
           this.router.navigate(['/tabs/home']);
@@ -96,8 +101,6 @@ export class LoginPagePage implements OnInit {
         await this.mostrarToast('Credenciales incorrectas. Por favor, verifica tus datos.', 'danger');
       }
     } catch (error: any) {
-      await loading.dismiss();
-      this.isLoading = false;
       console.error('Error en login:', error);
       
       let mensajeError = 'Error al iniciar sesión. Por favor, intenta nuevamente.';
@@ -115,6 +118,10 @@ export class LoginPagePage implements OnInit {
       }
       
       await this.mostrarToast(mensajeError, 'danger');
+    } finally {
+      this.isLoading = false;
+      // Evita que una excepción al cerrar el loading deje la UI bloqueada
+      await loading.dismiss().catch(() => undefined);
     }
   }
 

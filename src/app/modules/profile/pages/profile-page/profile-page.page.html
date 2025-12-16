@@ -1,13 +1,77 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>profile-page</ion-title>
+    <ion-title>Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile-page</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="profile-content ion-padding">
+  <div class="profile-header">
+    <button class="avatar-button" type="button" (click)="pickProfilePhoto()">
+      <ion-img
+        class="avatar"
+        [src]="imageProfile || user?.imageProfile || 'https://ionicframework.com/docs/img/demos/avatar.svg'"
+        alt="Foto de perfil">
+      </ion-img>
+    </button>
+
+    <div class="profile-name">
+      <h2>{{ (user?.names || '') + ' ' + (user?.surnames || '') }}</h2>
+      <p>{{ user?.email }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" class="form">
+    <div class="input-group">
+      <label>Nombre completo</label>
+      <ion-item lines="none" class="custom-input" [ngClass]="{'error-border': fullNameInvalid}">
+        <ion-input formControlName="fullName" placeholder="Nombre completo"></ion-input>
+      </ion-item>
+      <ion-text color="danger" class="error-msg" *ngIf="fullNameInvalid">
+        <small>El nombre completo es requerido.</small>
+      </ion-text>
+    </div>
+
+    <div class="input-group">
+      <label>Número de teléfono</label>
+      <ion-item lines="none" class="custom-input" [ngClass]="{'error-border': phoneInvalid}">
+        <ion-input
+          formControlName="phoneNumber"
+          type="tel"
+          inputmode="numeric"
+          placeholder="Ej: 99999999"
+          (ionInput)="onPhoneInput($event)">
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger" class="error-msg" *ngIf="phoneInvalid">
+        <small>{{ phoneErrorText }}</small>
+      </ion-text>
+    </div>
+
+    <div class="input-group">
+      <label>Fecha de nacimiento</label>
+      <ion-item lines="none" class="custom-input" [ngClass]="{'error-border': birthDateInvalid}">
+        <ion-datetime
+          formControlName="birthDate"
+          presentation="date"
+          prefer-wheel="true">
+        </ion-datetime>
+      </ion-item>
+      <ion-text color="danger" class="error-msg" *ngIf="birthDateInvalid">
+        <small>{{ birthDateErrorText }}</small>
+      </ion-text>
+    </div>
+
+    <ion-button
+      expand="block"
+      class="btn-save"
+      type="button"
+      (click)="save()"
+      [disabled]="form.invalid || isSaving">
+      Guardar
+    </ion-button>
+  </form>
+
+  <ion-button expand="block" color="danger" class="btn-logout" type="button" (click)="logout()">
+    Cerrar sesión
+  </ion-button>
 </ion-content>

@@ -39,6 +39,22 @@ ion-content {
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   --padding-start: 10px;
+
+  ion-input {
+    --color: #fff;
+    --placeholder-color: rgba(255, 255, 255, 0.65);
+    --placeholder-opacity: 1;
+  }
+
+  ion-input::part(native) {
+    color: #fff;
+    caret-color: #fff;
+  }
+
+  ion-input::part(native)::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+    opacity: 1;
+  }
   
   /* Borde Rojo si hay error */
   &.error-border {
