@@ -123,30 +123,41 @@ export class HomePagePage implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
+    console.log('🏠 [HomePage] Iniciando carga de datos...');
+
     try {
       
       this.userService.getUser().subscribe({
         next: (data) => {
           this.user = data;
-          console.log('Usuario cargado:', data);
+          console.log('✅ [HomePage] Usuario cargado:', data);
         },
-        error:  (err) => console.error('Error cargando usuario:', err)
+        error: (err) => {
+          console.error('❌ [HomePage] Error cargando usuario:', err);
+          this.errorMessage = 'Error cargando usuario: ' + (err?.message || JSON.stringify(err));
+        }
       });
 
       this.balanceService.getBalance().subscribe({
         next: (data) => {
           this.balance = data;
-          console.log('Balance cargado:', data);
+          console.log('✅ [HomePage] Balance cargado:', data);
         },
-        error: (err) => console.error('Error cargando balance:', err)
+        error: (err) => {
+          console.error('❌ [HomePage] Error cargando balance:', err);
+          // Mostrar balance por defecto si hay error
+          this.balance = { balance: 0, currency: 'USD' } as any;
+        }
       });
 
       this.transactionsService.getTransactions().subscribe({
         next: (data) => {
-          this. transactions = data;
-          console. log('Transacciones cargadas:', data);
+          this.transactions = data;
+          console.log('✅ [HomePage] Transacciones cargadas:', data);
         },
-        error: (err) => console.error('Error cargando transacciones:', err)
+        error: (err) => {
+          console.error('❌ [HomePage] Error cargando transacciones:', err);
+        }
       });
 
     } catch (error) {

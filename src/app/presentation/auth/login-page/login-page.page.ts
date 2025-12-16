@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { IonicModule, NavController, ModalController, ToastController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { shieldCheckmark, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../../shared/services/auth.service';
 import { PushNotificationsService } from '../../../shared/services/push-notifications.service';
@@ -31,7 +33,9 @@ export class LoginPagePage implements OnInit {
     private pushNotificationsService: PushNotificationsService,
     private toastController: ToastController,
     private loadingController: LoadingController
-  ) { }
+  ) {
+    addIcons({ shieldCheckmark, eyeOffOutline, eyeOutline });
+  }
 
   ngOnInit() {
     this.formularioLogin = this.fb.group({
@@ -61,18 +65,19 @@ export class LoginPagePage implements OnInit {
   // --- ACCIONES ---
 
   async ingresar() {
+    console.log('>>> BOTÓN PRESIONADO <<<');
+    
     if (this.formularioLogin.invalid) {
       this.formularioLogin.markAllAsTouched();
       await this.mostrarToast('Por favor, completa todos los campos correctamente.', 'warning');
       return;
     }
 
+    console.log('>>> FORMULARIO VÁLIDO <<<');
     this.isLoading = true;
-    const loading = await this.loadingController.create({
-      message: 'Iniciando sesión...',
-      spinner: 'crescent'
-    });
-    await loading.present();
+
+    // NO usar LoadingController - causa congelamiento en Android
+    // Mostrar loading usando la variable isLoading en el template
 
     try {
       // Normalizar email: eliminar espacios y convertir a minúsculas
@@ -80,23 +85,27 @@ export class LoginPagePage implements OnInit {
       // Normalizar contraseña: eliminar espacios al inicio y final
       const password = this.formularioLogin.value.contrasena.trim();
 
+      console.log('>>> LLAMANDO AUTH SERVICE <<<');
       console.log('🔐 Intentando login con:');
       console.log('  Email:', email);
       console.log('  Contraseña (longitud):', password.length);
 
       const exito = await this.authService.login(email, password);
+      console.log('>>> AUTH SERVICE RESPONDIÓ:', exito, '<<<');
 
       if (exito) {
-        // Inicializar push y sincronizar token en segundo plano
+        console.log('>>> LOGIN EXITOSO - Navegando a Home <<<');
+        
+        // Inicializar push en segundo plano (no bloquea)
         this.pushNotificationsService
           .init()
           .then(() => this.pushNotificationsService.syncCachedTokenToApi())
           .catch((err) => console.error('Error inicializando push:', err));
 
-        await this.mostrarToast('¡Sesión iniciada correctamente!', 'success');
-        setTimeout(() => {
-          this.router.navigate(['/tabs/home']);
-        }, 1000);
+        // Navegar inmediatamente sin esperar el toast
+        this.isLoading = false;
+        this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        return; // Salir para evitar ejecutar el finally
       } else {
         await this.mostrarToast('Credenciales incorrectas. Por favor, verifica tus datos.', 'danger');
       }
@@ -119,9 +128,8 @@ export class LoginPagePage implements OnInit {
       
       await this.mostrarToast(mensajeError, 'danger');
     } finally {
+      console.log('>>> FINALLY - Terminando <<<');
       this.isLoading = false;
-      // Evita que una excepción al cerrar el loading deje la UI bloqueada
-      await loading.dismiss().catch(() => undefined);
     }
   }
 

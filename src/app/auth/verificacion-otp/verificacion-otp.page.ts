@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { shieldCheckmark } from 'ionicons/icons';
 
 import { numericMinLengthValidator } from '../../shared/validators/custom.validators';
 import { AuthService } from '../../shared/services/auth.service';
@@ -42,6 +44,7 @@ export class VerificacionOtpPage implements OnInit {
     private toastController: ToastController,
     private loadingController: LoadingController
   ) {
+    addIcons({ shieldCheckmark });
     this.formularioOtp = this.formBuilder.group({
     
       tokenVerificacion: ['', [

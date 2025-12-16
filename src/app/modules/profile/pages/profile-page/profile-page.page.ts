@@ -51,7 +51,7 @@ export class ProfilePagePage implements OnInit {
         '',
         [Validators.required, Validators.pattern(/^\d{8,}$/)],
       ],
-      birthDate: ['', [Validators.required, this.birthDateNotFutureValidator]],
+      birthDate: ['', [this.birthDateNotFutureValidator]], // Fecha opcional
     });
 
     await this.loadProfile();
@@ -127,18 +127,20 @@ export class ProfilePagePage implements OnInit {
   }
 
   async save(): Promise<void> {
+    console.log('>>> GUARDAR PRESIONADO <<<');
+    console.log('Form valid:', this.form.valid);
+    console.log('Form errors:', this.form.errors);
+    console.log('User:', this.user);
+    
     if (this.form.invalid || !this.user) {
       this.form.markAllAsTouched();
+      console.log('>>> FORMULARIO INVÁLIDO <<<');
       await this.presentToast('Revisa los campos marcados.', 'warning');
       return;
     }
 
+    console.log('>>> GUARDANDO PERFIL <<<');
     this.isSaving = true;
-    const loading = await this.loadingController.create({
-      message: 'Guardando...',
-      spinner: 'crescent',
-    });
-    await loading.present();
 
     try {
       const fullName = String(this.form.value.fullName ?? '').trim();
@@ -169,6 +171,7 @@ export class ProfilePagePage implements OnInit {
       await new Promise<void>((resolve, reject) => {
         this.userService.updateUser(payload).subscribe({
           next: (updated) => {
+            console.log('>>> PERFIL ACTUALIZADO <<<', updated);
             this.user = updated;
             resolve();
           },
@@ -176,10 +179,8 @@ export class ProfilePagePage implements OnInit {
         });
       });
 
-      await loading.dismiss();
       await this.presentToast('Perfil actualizado correctamente', 'success');
     } catch (err) {
-      await loading.dismiss();
       console.error('Error guardando perfil:', err);
       await this.presentToast('No se pudo guardar el perfil.', 'danger');
     } finally {
@@ -193,13 +194,11 @@ export class ProfilePagePage implements OnInit {
   }
 
   // --------------------- Helpers ---------------------
+  isLoading = false;
+
   private async loadProfile(): Promise<void> {
-    const loading = await this.loadingController.create({
-      message: 'Cargando perfil...',
-      spinner: 'crescent',
-      duration: 8000,
-    });
-    await loading.present();
+    this.isLoading = true;
+    console.log('>>> CARGANDO PERFIL <<<');
 
     try {
       const cached = await Preferences.get({ key: 'imageProfile' });
@@ -208,6 +207,7 @@ export class ProfilePagePage implements OnInit {
       await new Promise<void>((resolve, reject) => {
         this.userService.getUser().subscribe({
           next: (user) => {
+            console.log('>>> PERFIL CARGADO <<<', user);
             this.user = user;
             const fullName = `${user.names ?? ''} ${user.surnames ?? ''}`.trim();
             this.form.patchValue({
@@ -226,7 +226,7 @@ export class ProfilePagePage implements OnInit {
       console.error('Error cargando perfil:', err);
       await this.presentToast('No se pudo cargar el perfil.', 'danger');
     } finally {
-      await loading.dismiss();
+      this.isLoading = false;
     }
   }
 

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { shieldCheckmark } from 'ionicons/icons';
 
 @Component({
   selector: 'app-recuperar-password',
@@ -17,7 +19,9 @@ export class RecuperarPasswordComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController
-  ) { }
+  ) {
+    addIcons({ shieldCheckmark });
+  }
 
   ngOnInit() {
     // Validamos que sea un correo real y requerido

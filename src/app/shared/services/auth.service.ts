@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
-import { firstValueFrom, TimeoutError, timeout } from 'rxjs';
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
+import { firstValueFrom, timeout } from 'rxjs';
 import { CreateAccountRequest, LoginRequest, PhoneVerificationRequest, PhoneVerifyRequest } from '../../core/interfaces/auth.interfaces';
 
 @Injectable({
@@ -19,6 +19,11 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  private isNativePlatform(): boolean {
+    const platform = Capacitor.getPlatform();
+    return platform === 'android' || platform === 'ios';
+  }
+
  
   async login(email: string, pass: string): Promise<boolean> {
 
@@ -28,42 +33,90 @@ export class AuthService {
       method: 0
     };
 
+    const isNative = this.isNativePlatform();
+    const platform = Capacitor.getPlatform();
+
     try {
       console.log('========================================');
       console.log('🔐 INICIANDO SESIÓN');
       console.log('========================================');
+      console.log('📱 Platform:', platform, '| isNative:', isNative);
       console.log('Email:', email);
       console.log('URL:', `${this.apiUrl}/auth/login`);
       console.log('Body:', body);
       console.log('========================================');
       
       const url = `${this.apiUrl}/auth/login`;
-
-      // En Android/iOS (WebView), el Origin suele ser capacitor://localhost y puede fallar por CORS.
-      // CapacitorHttp hace el request nativo y evita CORS; en web seguimos con HttpClient.
       let response: any;
-      if (Capacitor.isNativePlatform()) {
-        const nativeRequest = CapacitorHttp.post({
-          url,
-          headers: { 'Content-Type': 'application/json' },
-          data: body,
-        });
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
-        const nativeResponse = await Promise.race([
-          nativeRequest,
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error('Tiempo de espera agotado al iniciar sesión. Verifica tu conexión e intenta nuevamente.')),
-              20000
-            )
-          ),
-        ]);
+      if (isNative) {
+        // Usar CapacitorHttp para Android/iOS
+        console.log('🤖 Usando CapacitorHttp para login en', platform);
+        console.log('🔧 URL completa:', url);
+        console.log('🔧 Headers:', JSON.stringify(headers));
+        console.log('🔧 Body:', JSON.stringify(body));
+        console.log('🚀 Llamando a CapacitorHttp.post() AHORA...');
+        
+        try {
+          const httpResponse = await CapacitorHttp.post({
+            url,
+            headers,
+            data: body,
+          });
 
-        // CapacitorHttp devuelve { data, status, headers }
-        response = (nativeResponse as any)?.data ?? nativeResponse;
+          console.log('✅ CapacitorHttp RESPONDIÓ!');
+          console.log('📦 CapacitorHttp Data:', JSON.stringify(httpResponse.data));
+
+          if (httpResponse.status >= 400) {
+            const errorMsg = httpResponse.data?.message || `Error del servidor: ${httpResponse.status}`;
+            throw { status: httpResponse.status, message: errorMsg, error: httpResponse.data };
+          }
+
+          response = httpResponse.data;
+        } catch (httpError: any) {
+          console.error('💥 CapacitorHttp Error:', httpError);
+          throw httpError;
+        }
       } else {
-        // Petición POST real a la API (con timeout para evitar quedarse colgado)
-        response = await firstValueFrom(this.http.post(url, body).pipe(timeout(20000)));
+        // Usar fetch para web
+        console.log('🌍 Usando fetch para login en web');
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        try {
+          const fetchResponse = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          console.log('✅ Fetch Status:', fetchResponse.status);
+
+          if (!fetchResponse.ok) {
+            const errorData = await fetchResponse.json().catch(() => ({}));
+            const errorMsg = errorData?.message || `Error del servidor: ${fetchResponse.status}`;
+            throw { status: fetchResponse.status, message: errorMsg, error: errorData };
+          }
+
+          response = await fetchResponse.json();
+          console.log('📦 Fetch Response:', JSON.stringify(response));
+        } catch (fetchError: any) {
+          clearTimeout(timeoutId);
+          if (fetchError.name === 'AbortError') {
+            throw new Error('Tiempo de espera agotado al iniciar sesión. Verifica tu conexión e intenta nuevamente.');
+          }
+          console.error('💥 Fetch Error:', fetchError);
+          throw fetchError;
+        }
       }
       
       console.log('Respuesta del login:', response);
@@ -83,9 +136,6 @@ export class AuthService {
       console.warn('No se encontró token en la respuesta');
       return false;
     } catch (error: any) {
-      if (error instanceof TimeoutError) {
-        throw new Error('Tiempo de espera agotado al iniciar sesión. Verifica tu conexión e intenta nuevamente.');
-      }
       console.error('Error Login:', error);
       console.error('Detalles del error:', {
         status: error?.status,

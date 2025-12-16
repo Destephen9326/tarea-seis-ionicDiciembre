@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { Transaction } from '../interfaces/transaction.interface';
+import { HttpService } from './http.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionsService {
 
-  private apiUrl = 'https://wallet-ceutec-api.azurewebsites.net/api';
-
-  constructor(private http: HttpClient) {}
+  constructor(private httpService: HttpService) {}
 
   getTransactions(): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.apiUrl}/transactions`);
+    return from(this.httpService.get<Transaction[]>('/transactions'));
   }
 }

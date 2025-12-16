@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { User } from '../interfaces/user.interface';
+import { HttpService } from './http.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private apiUrl = 'https://wallet-ceutec-api.azurewebsites.net/api';
-
-  constructor(private http: HttpClient) {}
+  constructor(private httpService: HttpService) {}
 
   getUser(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/user`);
+    return from(this.httpService.get<User>('/user'));
   }
 
   updateUser(payload: Partial<User> & { id: number }): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/user`, payload);
+    return from(this.httpService.put<User>('/user', payload));
   }
 
   /**

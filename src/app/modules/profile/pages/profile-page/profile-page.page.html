@@ -48,13 +48,13 @@
     </div>
 
     <div class="input-group">
-      <label>Fecha de nacimiento</label>
+      <label>Fecha de nacimiento (opcional)</label>
       <ion-item lines="none" class="custom-input" [ngClass]="{'error-border': birthDateInvalid}">
-        <ion-datetime
+        <ion-input
           formControlName="birthDate"
-          presentation="date"
-          prefer-wheel="true">
-        </ion-datetime>
+          type="date"
+          placeholder="Seleccionar fecha">
+        </ion-input>
       </ion-item>
       <ion-text color="danger" class="error-msg" *ngIf="birthDateInvalid">
         <small>{{ birthDateErrorText }}</small>
@@ -66,8 +66,8 @@
       class="btn-save"
       type="button"
       (click)="save()"
-      [disabled]="form.invalid || isSaving">
-      Guardar
+      [disabled]="isSaving">
+      {{ isSaving ? 'Guardando...' : 'Guardar' }}
     </ion-button>
   </form>
 

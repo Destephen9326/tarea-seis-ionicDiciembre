@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { Balance } from '../interfaces/balance.interface';
+import { HttpService } from './http.service';
 
 @Injectable({
-  providedIn:  'root'
+  providedIn: 'root'
 })
 export class BalanceService {
 
-  private apiUrl = 'https://wallet-ceutec-api. azurewebsites.net/api';
-
-  constructor(private http: HttpClient) {}
+  constructor(private httpService: HttpService) {}
 
   getBalance(): Observable<Balance> {
-    return this.http.get<Balance>(`${this.apiUrl}/balance`);
+    return from(this.httpService.get<Balance>('/balance'));
   }
 }
